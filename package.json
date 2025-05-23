@@ -3,6 +3,7 @@
   "license": "UNLICENSED",
   "type": "module",
   "dependencies": {
+    "@fontsource/varela-round": "4.5.0",
     "@polymer/polymer": "3.5.2",
     "@vaadin/bundles": "24.7.6",
     "@vaadin/common-frontend": "0.0.19",
@@ -28,8 +29,7 @@
     "proj4": "2.15.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "react-router": "7.5.2",
-    "@fontsource/varela-round": "4.5.0"
+    "react-router": "7.5.2"
   },
   "devDependencies": {
     "@babel/preset-react": "7.26.3",
@@ -52,6 +52,7 @@
     "@vitejs/plugin-react": "4.4.1",
     "async": "3.2.6",
     "glob": "11.0.2",
+    "prettier": "3.3.3",
     "rollup-plugin-brotli": "3.1.0",
     "rollup-plugin-visualizer": "5.14.0",
     "strip-css-comments": "5.0.0",
@@ -61,8 +62,7 @@
     "vite-plugin-checker": "0.9.1",
     "workbox-build": "7.3.0",
     "workbox-core": "7.3.0",
-    "workbox-precaching": "7.3.0",
-    "prettier": "3.3.3"
+    "workbox-precaching": "7.3.0"
   },
   "vaadin": {
     "dependencies": {
@@ -125,7 +125,7 @@
       "workbox-core": "7.3.0",
       "workbox-precaching": "7.3.0"
     },
-    "hash": "fc3d1c51586ac4b3a04eb7428f3142d281624c6a960b60b036b94a6ba31a03f9"
+    "hash": "d7a3fb18a4fe1cf4a73d1d2b5684d61e52ce565e464a522c0e808903bcc015db"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -164,6 +164,7 @@
     "@vaadin/vaadin-themable-mixin": "$@vaadin/vaadin-themable-mixin",
     "@vaadin/vaadin-lumo-styles": "$@vaadin/vaadin-lumo-styles",
     "@vaadin/vaadin-material-styles": "$@vaadin/vaadin-material-styles",
-    "react-router": "$react-router"
+    "react-router": "$react-router",
+    "@fontsource/varela-round": "$@fontsource/varela-round"
   }
 }
