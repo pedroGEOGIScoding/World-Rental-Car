@@ -12,13 +12,10 @@ public interface DelegationRepository {
   
   <T> List<T> listByPartitionKey(String partitionKey, Class<T> clazz);
   
-  <T> List<T> listAll(Class<T> clazz);
-  
   //Specific methods where both Car and Delegation classes are annotated with DynamoDB and use @DynamoDbBean annotations
   List<Car> listAllCars();
   
   List<Delegation> listAllDelegations();
-  
   
   <T> List<T> listAllItems(Class<T> clazz);
 }

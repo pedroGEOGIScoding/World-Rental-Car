@@ -34,8 +34,7 @@ public class DelegationRepositoryImpl implements DelegationRepository {
   
   @Override
   public <T> T get(String partitionKey, String sortKey, Class<T> clazz) {
-	DynamoDbTable<T> table = enhancedClient.table(
-		tableName, TableSchema.fromBean(clazz));
+	DynamoDbTable<T> table = enhancedClient.table(tableName, TableSchema.fromBean(clazz));
 	Key key = Key.builder()
 		.partitionValue(partitionKey)
 		.sortValue(sortKey)
@@ -52,10 +51,6 @@ public class DelegationRepositoryImpl implements DelegationRepository {
 	return items;
   }
   
-  @Override
-  public <T> List<T> listAll(Class<T> clazz) {
-	return List.of();
-  }
   
   @Override
   public List<Car> listAllCars() {
