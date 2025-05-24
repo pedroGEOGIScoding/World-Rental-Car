@@ -38,22 +38,22 @@ public class DelegationEndpoint {
   }
   
   // List Delegations by delegationId
-  public List<Delegation> listDelegations(String delegationId) {
+  public List<Delegation> listDelegationsById(String delegationId) {
 	return delegationRepository.listByPartitionKey(delegationId, Delegation.class);
   }
   
   // List Cars by id (partition key)
-  public List<Car> listCars(String carId) {
+  public List<Car> listCarsById(String carId) {
 	return delegationRepository.listByPartitionKey(carId, Car.class);
   }
   
   //List all cars for all delegations
-  public List<Car> listAllCars() {
+  public List<Car> getAllCars() {
 	return delegationRepository.listAllCars();
   }
   
   //LIst all delegations with operation = "profile"
-  public List<Delegation> listAllDelegations() {
+  public List<Delegation> getAllProfileDelegations() {
 	return delegationRepository.listAllDelegations();
   }
   
