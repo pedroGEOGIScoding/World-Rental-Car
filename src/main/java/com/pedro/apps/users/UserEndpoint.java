@@ -3,7 +3,6 @@ package com.pedro.apps.users;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.List;
 
 @Endpoint
