@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
+import {useNavigate} from "react-router";
 
-export const config: ViewConfig = { menu: { order: 7, icon: 'line-awesome/svg/car-solid.svg' }, title: 'Book a car' };
+export const config: ViewConfig = {
+  menu: { order: 2,icon: 'line-awesome/svg/car-solid.svg' },
+  title: 'Book a car' };
 
 export default function BookacarView() {
   const [startDate, setStartDate] = useState('');
@@ -9,13 +12,19 @@ export default function BookacarView() {
   const [sameLocation, setSameLocation] = useState(false);
   const [pickupLocation, setPickupLocation] = useState('');
   const [returnLocation, setReturnLocation] = useState('');
+  const navigate = useNavigate();
 
   // Example locations; replace with real data as needed
   const locations = ['London', 'Manchester', 'Birmingham', 'Liverpool'];
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate('/bookcar/bookcarSelection');
+  };
+
   return (
     <div style={{ maxWidth: 400, margin: '2rem auto', padding: 24, background: '#fff', borderRadius: 8 }}>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
           <div style={{ flex: 1 }}>
             <label>Start Date <span style={{ color: '#007bff' }}>•</span></label>

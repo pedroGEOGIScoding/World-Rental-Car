@@ -1,7 +1,7 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 
 export const config: ViewConfig = {
-  menu: { order: 6, icon: 'line-awesome/svg/map-marked-alt-solid.svg' },
+  menu: { order: 11, icon: 'line-awesome/svg/map-marked-alt-solid.svg' },
   title: 'Tracking Cars',
 };
 
