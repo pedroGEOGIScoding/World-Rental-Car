@@ -2,7 +2,9 @@ import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import React from "react";
 import { useNavigate } from "react-router";
 
-export const config: ViewConfig = { menu: { order: 0, icon: 'line-awesome/svg/home-solid.svg' }, title: 'Home' };
+export const config: ViewConfig = {
+    menu: { order: 0, icon: 'line-awesome/svg/home-solid.svg' },
+    title: 'Home' };
 
 export default function HomeView() {
   const navigate = useNavigate();
