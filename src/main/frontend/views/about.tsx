@@ -38,7 +38,7 @@ export default function AboutView() {
         </p>
         <p style={{ fontSize: "clamp(1rem, 2vw, 1.2rem)", marginBottom: 0, opacity: 0.85 }}>
           Discover the freedom of the open road with us—your trusted partner for car rentals worldwide.
-        </p>
+        </p><div className="flex flex-col"></div>
       </div>
     </div>
   );
