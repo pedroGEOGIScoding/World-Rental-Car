@@ -19,17 +19,16 @@ public class Car {
   private float lat;
   private float lon;
   private int price;
-  public enum status {AVAILABLE, RENTED, MAINTENANCE, OUT_OF_ORDER}
-  private status carStatus;
-  private Map<String, Boolean> bookingDates;
+  public CarStatus carStatus;
+  private Map<String, String> bookingDates;
 
   // Default constructor required for DynamoDB's enhanced client
   public Car() {
     this.bookingDates = new HashMap<>();
-    this.carStatus = status.AVAILABLE; // Default status
+    this.carStatus = CarStatus.AVAILABLE; // Default status
   }
 
-  public Car(String delegationId, String operation, String carId, String make, String model, String year, String color, Boolean rented, float lat, float lon, int price, status carStatus, Map<String, Boolean> bookingDates) {
+  public Car(String delegationId, String operation, String carId, String make, String model, String year, String color, Boolean rented, float lat, float lon, int price, CarStatus carStatus, Map<String, String> bookingDates) {
 	this.delegationId = delegationId;
 	this.operation = operation;
 	this.carId = carId;
@@ -136,21 +135,21 @@ public class Car {
 	this.price = price;
   }
 
-  @DynamoDbAttribute("status")
-  public status getStatus() {
+  @DynamoDbAttribute("carStatus")
+  public CarStatus getStatus() {
 	return carStatus;
   }
 
-  public void setStatus(status carStatus) {
+  public void setStatus(CarStatus carStatus) {
 	this.carStatus = carStatus;
   }
 
   @DynamoDbAttribute("bookingDates")
-  public Map<String, Boolean> getBookingDates() {
+  public Map<String, String> getBookingDates() {
 	return bookingDates;
   }
 
-  public void setBookingDates(Map<String, Boolean> bookingDates) {
+  public void setBookingDates(Map<String, String> bookingDates) {
 	this.bookingDates = bookingDates;
   }
 

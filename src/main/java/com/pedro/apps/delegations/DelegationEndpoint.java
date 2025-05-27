@@ -62,7 +62,7 @@ public class DelegationEndpoint {
           car.setBookingDates(new HashMap<>());
         }
         if (car.getStatus() == null) {
-          car.setStatus(Car.status.AVAILABLE);
+          car.setStatus(CarStatus.AVAILABLE);
         }
       }
 
