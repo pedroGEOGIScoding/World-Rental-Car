@@ -22,13 +22,14 @@ public class User {
 	this.userRole = UserRole.CUSTOMER; // Default status
   }
   
-  public User(String userId, String operation, String username, String email, String fullName, String phone) {
+  public User(String userId, String operation, String username, String email, String fullName, String phone, UserRole userRole) {
 	this.userId = userId;
 	this.operation = operation;
 	this.username = username;
 	this.email = email;
 	this.fullName = fullName;
 	this.phone = phone;
+	this.userRole = UserRole.CUSTOMER;
   }
   
   @DynamoDbPartitionKey
