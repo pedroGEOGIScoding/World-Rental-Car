@@ -78,5 +78,9 @@ public class DelegationEndpoint {
   public List<Delegation> getAllProfileDelegations() {
 	return delegationRepository.listAllDelegations();
   }
+  
+  public List<Delegation> getAllDelegations() {
+    return delegationRepository.listAllItems(Delegation.class);
+  }
 
 }
