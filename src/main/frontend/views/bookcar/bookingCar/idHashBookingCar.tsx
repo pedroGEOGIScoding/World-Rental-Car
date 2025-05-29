@@ -9,8 +9,6 @@ export const config: ViewConfig = {
 
 export default function BookingCar() {
     const { idHashBookingCar } = useParams<{ idHashBookingCar: string }>();
-    const navigate = useNavigate();
-    const location = useLocation();
 
     return (
         <div>

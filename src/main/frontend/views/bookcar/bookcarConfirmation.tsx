@@ -55,7 +55,7 @@ export default function BookcarConfirmView() {
         
         // Navigate to home or booking confirmation
         setTimeout(() => {
-            navigate('/');
+            navigate('/bookcar/bookingCar/idHashBookingCar');
         }, 2000);
     };
 
@@ -93,7 +93,7 @@ export default function BookcarConfirmView() {
                     <div className="flex flex-col gap-s">
                         <div className="font-bold text-xl">{car.make} {car.model} ({car.year})</div>
                         <div><strong>Color:</strong> {car.color}</div>
-                        <div><strong>Price per day:</strong> ${car.price.toFixed(2)}</div>
+                        <div><strong>Price per day:</strong> €{car.price.toFixed(2)}</div>
                     </div>
                 </Card>
                 
@@ -104,7 +104,7 @@ export default function BookcarConfirmView() {
                         <div><strong>Return Date:</strong> {formattedEndDate}</div>
                         <div><strong>Pickup Location:</strong> {pickupLocation}</div>
                         <div><strong>Return Location:</strong> {returnLocation}</div>
-                        <div className="font-bold mt-m text-xl">Total Price: ${totalPrice.toFixed(2)}</div>
+                        <div className="font-bold mt-m text-xl">Total Price:  €{totalPrice.toFixed(2)}</div>
                     </div>
                 </Card>
                 

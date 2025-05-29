@@ -59,7 +59,7 @@ export default function TrackingCarsView() {
             }).addTo(map);
             
             // Add markers for cars with valid coordinates
-            const validCars = cars.filter(car => car && typeof car.lat === 'number' && typeof car.lon === 'number');
+            const validCars = cars.filter(car => car && true && true);
             
             if (validCars.length > 0) {
                 // Create bounds to fit all markers
@@ -74,7 +74,7 @@ export default function TrackingCarsView() {
                             <b>Make:</b> ${car.make || 'N/A'}<br>
                             <b>Model:</b> ${car.model || 'N/A'}<br>
                             <b>Year:</b> ${car.year || 'N/A'}<br>
-                            <b>Operation:</b> ${car.operation}<br>
+                            <b>Operation:</b> ${car.status}<br>
                             <b>Location:</b> ${car.lat}, ${car.lon}
                         `);
                     

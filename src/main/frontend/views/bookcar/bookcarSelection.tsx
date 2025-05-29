@@ -185,10 +185,27 @@ export default function BookcarSelectionView() {
 							className="hover:shadow-xl transition-shadow"
 						>
 							<div className="p-m">
+								<img
+										src={`https://cdn.imagin.studio/getimage?customer=img&make=${encodeURIComponent(car.make || '')}&modelFamily=${encodeURIComponent((car.model || '').split(' ')[0])}&zoomType=fullscreen`}
+										alt={`${car.make || 'Unknown'} ${car.model || 'Model'}`}
+										style={{
+											width: '100%',
+											height: 'auto',
+											maxHeight: '160px',
+											objectFit: 'contain',
+											objectPosition: 'center',
+											borderRadius: '8px',
+											marginBottom: '1rem',
+											backgroundColor: '#f5f5f5'
+										}}
+										onError={(e) => {
+											(e.target as HTMLImageElement).src = 'https://placehold.co/300x180?text=Car+Not+Found';
+										}}
+								/>
 								<h3 className="mb-s font-bold text-xl">{car.make || 'Unknown'} {car.model || 'Model'} ({car.year || 'N/A'})</h3>
 								<div className="flex flex-col gap-s">
 									<div><strong>Color:</strong> {car.color || 'N/A'}</div>
-									<div><strong>Price:</strong> ${car.price !== undefined ? car.price.toFixed(2) : 'N/A'}/day</div>
+									<div><strong>Price:</strong>  €{car.price !== undefined ? car.price.toFixed(2) : 'N/A'}/day</div>
 									<div className="mt-s">
 										<span className="bg-success text-success-contrast px-s py-xs rounded-full text-sm">
 											Available
@@ -201,7 +218,7 @@ export default function BookcarSelectionView() {
 											onClick={() => handleSelectCar(car)}
 											className="w-full"
 										>
-											Select This Car
+											Select this Car to confirm the booking
 										</Button>
 									</div>
 								</div>
