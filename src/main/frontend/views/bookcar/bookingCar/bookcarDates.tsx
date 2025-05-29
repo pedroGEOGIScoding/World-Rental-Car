@@ -1,23 +1,70 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useReducer, useState} from 'react';
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import {useNavigate} from "react-router";
 import {Button, ComboBox, Checkbox, DatePicker, DatePickerElement} from "@vaadin/react-components";
 import { formatISO } from 'date-fns';
 import { useSignal } from '@vaadin/hilla-react-signals';
-import {DelegationEndpoint} from "Frontend/generated/endpoints";
-import Car from "Frontend/generated/com/pedro/apps/delegations/Car";
-import Delegation from "Frontend/generated/com/pedro/apps/delegations/Delegation";
 
 export const config: ViewConfig = {
   menu: { order: 2,icon: 'line-awesome/svg/car-solid.svg' },
   title: 'Book a car' };
 
+// Define the state interface
+interface BookingState {
+  startDate: string;
+  endDate: string;
+  sameLocation: boolean;
+  pickupLocation: string;
+  returnLocation: string;
+}
+
+// Define action types
+type BookingAction = 
+  | { type: 'SET_START_DATE'; payload: string }
+  | { type: 'SET_END_DATE'; payload: string }
+  | { type: 'SET_SAME_LOCATION'; payload: boolean }
+  | { type: 'SET_PICKUP_LOCATION'; payload: string }
+  | { type: 'SET_RETURN_LOCATION'; payload: string };
+
+// Initial state
+const initialState: BookingState = {
+  startDate: '',
+  endDate: '',
+  sameLocation: false,
+  pickupLocation: '',
+  returnLocation: ''
+};
+
+// Reducer function
+function bookingReducer(state: BookingState, action: BookingAction): BookingState {
+  switch (action.type) {
+    case 'SET_START_DATE':
+      return { ...state, startDate: action.payload };
+    case 'SET_END_DATE':
+      return { ...state, endDate: action.payload };
+    case 'SET_SAME_LOCATION':
+      return { 
+        ...state, 
+        sameLocation: action.payload,
+        // If setting sameLocation to true, copy pickup location to return location
+        returnLocation: action.payload ? state.pickupLocation : state.returnLocation
+      };
+    case 'SET_PICKUP_LOCATION':
+      return { 
+        ...state, 
+        pickupLocation: action.payload,
+        // If sameLocation is true, update return location as well
+        returnLocation: state.sameLocation ? action.payload : state.returnLocation
+      };
+    case 'SET_RETURN_LOCATION':
+      return { ...state, returnLocation: action.payload };
+    default:
+      return state;
+  }
+}
+
 export default function BookacarView() {
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [sameLocation, setSameLocation] = useState(false);
-  const [pickupLocation, setPickupLocation] = useState('');
-  const [returnLocation, setReturnLocation] = useState('');
+  const [bookingState, dispatch] = useReducer(bookingReducer, initialState);
   const navigate = useNavigate();
 
   // Date validation
@@ -29,10 +76,6 @@ export default function BookacarView() {
   const minDate = useSignal(today);
   const maxDate = useSignal(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 180));
 
-
-
-
-
   // Example locations; replace with real data as needed
   const locations = ['DELEG#001', 'DELEG#002', 'DELEG#003', 'DELEG#004', "DELEG#005"];
 
@@ -42,6 +85,9 @@ export default function BookacarView() {
       alert('Please fix the validation errors before proceeding');
       return;
     }
+
+    // Destructure state for easier access
+    const { startDate, endDate, pickupLocation, sameLocation, returnLocation } = bookingState;
 
     // Validate form data
     if (startDate && endDate && pickupLocation && (sameLocation || returnLocation)) {
@@ -78,8 +124,8 @@ export default function BookacarView() {
             required
             min={formatISO(minDate.value, { representation: 'date' })}
             max={formatISO(maxDate.value, { representation: 'date' })}
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            value={bookingState.startDate}
+            onChange={(e) => dispatch({ type: 'SET_START_DATE', payload: e.target.value })}
             errorMessage={startDateError.value}
             onValidated={(event) => {
               const field = event.target as DatePickerElement;
@@ -103,8 +149,8 @@ export default function BookacarView() {
             required
             min={formatISO(minDate.value, { representation: 'date' })}
             max={formatISO(maxDate.value, { representation: 'date' })}
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+            value={bookingState.endDate}
+            onChange={(e) => dispatch({ type: 'SET_END_DATE', payload: e.target.value })}
             errorMessage={endDateError.value}
             onValidated={(event) => {
               const field = event.target as DatePickerElement;
@@ -125,29 +171,26 @@ export default function BookacarView() {
           <ComboBox
             label="Pickup Location"
             items={locations}
-            value={pickupLocation}
-            onChange={(e) => setPickupLocation(e.target.value as string)}
+            value={bookingState.pickupLocation}
+            onChange={(e) => dispatch({ type: 'SET_PICKUP_LOCATION', payload: e.target.value as string })}
             required
             clearButtonVisible
           />
 
           <Checkbox
             label="Return to same location"
-            checked={sameLocation}
+            checked={bookingState.sameLocation}
             onCheckedChanged={(e) => {
-              setSameLocation(e.detail.value);
-              if (e.detail.value) {
-                setReturnLocation(pickupLocation);
-              }
+              dispatch({ type: 'SET_SAME_LOCATION', payload: e.detail.value });
             }}
           />
 
-          {!sameLocation && (
+          {!bookingState.sameLocation && (
             <ComboBox
               label="Return Location"
               items={locations}
-              value={returnLocation}
-              onChange={(e) => setReturnLocation(e.target.value as string)}
+              value={bookingState.returnLocation}
+              onChange={(e) => dispatch({ type: 'SET_RETURN_LOCATION', payload: e.target.value as string })}
               required
               clearButtonVisible
             />
