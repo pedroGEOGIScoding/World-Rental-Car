@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import Car from "Frontend/generated/com/pedro/apps/delegations/Car";
 import {useNavigate} from "react-router";
 import {DelegationEndpoint} from "Frontend/generated/endpoints";
-import {Card} from "@vaadin/react-components";
+import {Card, Button} from "@vaadin/react-components";
 
 export const config: ViewConfig = {
 	menu: { exclude: true },
@@ -20,7 +20,6 @@ export default function BookcarSelectionView() {
 		pickupLocation: string;
 		returnLocation: string;
 	} | null>(null);
-	const [carImages, setCarImages] = useState<{ [key: string]: string }>({});
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -143,93 +142,34 @@ export default function BookcarSelectionView() {
 
 		console.log('BookcarSelectionView: Filtered cars result:', filtered);
 		setFilteredCars(filtered);
-		
-		// Fetch car images for the filtered cars
-		filtered.forEach(car => {
-			fetchCarImage(car);
-		});
 	}, [cars, bookingData]);
 
-	// Function to fetch car image from a public API
-	const fetchCarImage = async (car: Car) => {
-		if (!car.make || !car.model) return;
-		
-		const carKey = `${car.delegationId}-${car.operation}`;
-		
-		// If we already have an image for this car, don't fetch again
-		if (carImages[carKey]) return;
-		
-		try {
-			// First try the CarQuery API (doesn't require API key)
-			const make = encodeURIComponent(car.make.toLowerCase());
-			const model = encodeURIComponent(car.model.toLowerCase().replace(/\s+/g, '-'));
-			const year = car.year || '2023';
-			
-			// Try multiple image sources
-			const sources = [
-				// CarQuery API (public, no API key needed)
-				`https://www.carqueryapi.com/api/0/image.php?make=${make}&model=${model}&year=${year}`,
-				
-				// Pixabay API (public endpoint with car images)
-				`https://pixabay.com/api/?key=no-key-required-for-this-demo&q=${make}+${model}+car&image_type=photo&per_page=3`,
-				
-				// Fall back to DuckDuckGo image proxy (doesn't require API key)
-				`https://duckduckgo.com/i.js?q=${make}+${model}+car&o=json`,
-				
-				// WikiMedia Commons API (public, no API key needed)
-				`https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${make}+${model}+car&prop=imageinfo&iiprop=url&format=json&origin=*`
-			];
-			
-			// Try to fetch from each source until we get a valid image
-			let imageUrl = '';
-			
-			// First try a direct image match from CarMD data (this is a fictional endpoint for demonstration)
-			try {
-				const response = await fetch(`https://cdn.imagin.studio/getimage?customer=img&make=${make}&modelFamily=${model}&modelYear=${year}`);
-				if (response.ok) {
-					imageUrl = response.url;
-					console.log('Found direct car image match for', car.make, car.model);
-				}
-			} catch (err) {
-				console.log('Could not fetch from direct car image source, trying alternatives');
-			}
-			
-			// If no direct match, use placeholder with car info
-			if (!imageUrl) {
-				imageUrl = `https://via.placeholder.com/400x225/1976d2/ffffff?text=${encodeURIComponent(`${car.make} ${car.model}`)}`;
-				console.log('Using placeholder image for', car.make, car.model);
-			}
-			
-			// Store the image URL in state
-			setCarImages(prevImages => ({
-				...prevImages,
-				[carKey]: imageUrl
-			}));
-		} catch (error) {
-			console.error('Error fetching car image:', error);
-			
-			// Fallback to a colored placeholder with car text
-			const fallbackUrl = `https://via.placeholder.com/400x225/f44336/ffffff?text=${encodeURIComponent(`${car.make} ${car.model}`)}`;
-			
-			setCarImages(prevImages => ({
-				...prevImages,
-				[carKey]: fallbackUrl
-			}));
-		}
-	};
-
 	const handleSelectCar = (car: Car) => {
-		// Add logic to select car and proceed with booking
-		console.log('Selected car:', car);
-		// Store the selected car in localStorage
-		localStorage.setItem('selectedCar', JSON.stringify(car));
+		// Calculate the total price based on the number of days
+		let totalPrice = 0;
+		if (bookingData) {
+			const startDate = new Date(bookingData.startDate);
+			const endDate = new Date(bookingData.endDate);
+			const dayDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+			totalPrice = car.price * dayDifference;
+		}
+
+		// Store the selected car and calculated total in localStorage
+		const bookingDetails = {
+			car,
+			totalPrice,
+			...bookingData
+		};
+		localStorage.setItem('bookingDetails', JSON.stringify(bookingDetails));
+		
+		console.log('Selected car with booking details:', bookingDetails);
 		navigate('/bookcar/bookcarConfirmation');
 	};
 
 	return (
 		<div className="p-m">
-			<h2>List of available cars</h2>
-			<h3>Please select the car you like the most before confirming booking</h3>
+			<h3>Available cars in {bookingData?.pickupLocation} for rent between {bookingData?.startDate} and {bookingData?.endDate}</h3>
+			<h5>Please select the car you like the most before confirming booking</h5>
 
 			{loading ? (
 				<div>Loading available cars...</div>
@@ -238,55 +178,36 @@ export default function BookcarSelectionView() {
 			) : filteredCars.length === 0 ? (
 				<div>No cars available at the moment. Please try again later.</div>
 			) : (
-
-
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-m">
-					{filteredCars.map((car) => {
-						const carKey = `${car.delegationId}-${car.operation}`;
-						return (
-							<Card
-								key={carKey}
-								className="cursor-pointer hover:shadow-xl transition-shadow"
-								onClick={() => handleSelectCar(car)}
-							>
-								<div style={{ height: '200px', overflow: 'hidden', position: 'relative', background: '#f5f5f5' }}>
-									{carImages[carKey] ? (
-										<img 
-											src={carImages[carKey]} 
-											alt={`${car.make} ${car.model}`} 
-											style={{ 
-												width: '100%', 
-												height: '100%', 
-												objectFit: 'cover' 
-											}} 
-										/>
-									) : (
-										<div style={{ 
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-											height: '100%',
-											color: '#888'
-										}}>
-											Loading image...
-										</div>
-									)}
-								</div>
-								<div className="p-m">
-									<h3 className="mb-s font-bold text-xl">{car.make || 'Unknown'} {car.model || 'Model'} ({car.year || 'N/A'})</h3>
-									<div className="flex flex-col gap-s">
-										<div><strong>Color:</strong> {car.color || 'N/A'}</div>
-										<div><strong>Price:</strong> €{car.price !== undefined ? car.price.toFixed(2) : 'N/A'}/day</div>
-										<div className="mt-s">
-											<span className="bg-success text-success-contrast px-s py-xs rounded-full text-sm">
-												Available
-											</span>
-										</div>
+					{filteredCars.map((car) => (
+						<Card
+							key={`${car.delegationId}-${car.operation}`}
+							className="hover:shadow-xl transition-shadow"
+						>
+							<div className="p-m">
+								<h3 className="mb-s font-bold text-xl">{car.make || 'Unknown'} {car.model || 'Model'} ({car.year || 'N/A'})</h3>
+								<div className="flex flex-col gap-s">
+									<div><strong>Color:</strong> {car.color || 'N/A'}</div>
+									<div><strong>Price:</strong> ${car.price !== undefined ? car.price.toFixed(2) : 'N/A'}/day</div>
+									<div className="mt-s">
+										<span className="bg-success text-success-contrast px-s py-xs rounded-full text-sm">
+											Available
+										</span>
+									</div>
+									
+									<div className="mt-m">
+										<Button 
+											theme="primary" 
+											onClick={() => handleSelectCar(car)}
+											className="w-full"
+										>
+											Select This Car
+										</Button>
 									</div>
 								</div>
-							</Card>
-						);
-					})}
+							</div>
+						</Card>
+					))}
 				</div>
 			)}
 		</div>
