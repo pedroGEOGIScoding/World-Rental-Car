@@ -34,7 +34,7 @@ export default function BookacarView() {
 
 
   // Example locations; replace with real data as needed
-  const locations = ['Barcelona', 'Madrid', 'Bilbao', 'Valencia', "Zaragoza"];
+  const locations = ['DELEG#001', 'DELEG#002', 'DELEG#003', 'DELEG#004', "DELEG#005"];
 
   const handleSubmit = () => {
     // Check for validation errors
@@ -45,9 +45,9 @@ export default function BookacarView() {
 
     // Validate form data
     if (startDate && endDate && pickupLocation && (sameLocation || returnLocation)) {
-      // Check if end date is after start date
-      if (new Date(endDate) <= new Date(startDate)) {
-        alert('End date must be after start date');
+      // Check if end date is before start date
+      if (new Date(endDate) < new Date(startDate)) {
+        alert('End date must be on or after start date');
         return;
       }
 
