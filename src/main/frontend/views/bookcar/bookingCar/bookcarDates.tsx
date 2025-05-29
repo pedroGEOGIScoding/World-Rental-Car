@@ -51,6 +51,15 @@ export default function BookacarView() {
         return;
       }
 
+      // Save booking data to localStorage
+      const bookingData = {
+        startDate,
+        endDate,
+        pickupLocation,
+        returnLocation: sameLocation ? pickupLocation : returnLocation
+      };
+      localStorage.setItem('bookingData', JSON.stringify(bookingData));
+
       navigate('/bookcar/bookcarSelection');
     } else {
       alert('Please fill in all required fields');
