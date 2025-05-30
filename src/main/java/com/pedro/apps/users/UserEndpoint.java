@@ -22,6 +22,24 @@ public class UserEndpoint {
 	userRepository.save(user);
   }
   
+  //Update user
+  public void updateUser(User user) {
+	System.out.println("UserEndpoint.updateUser: " + user);
+	userRepository.save(user);
+  }
+  
+  //Get all users
+  public List<User> getAllUsersById(String userId) {
+    System.out.println("UserEndpoint.getAllUsersById: Retrieving all users with operation/userId: " + userId);
+	return userRepository.getAllUsersById(userId);
+  }
+  
+  //Get all users without operation parameter
+  public List<User> getAllUsers() {
+    System.out.println("UserEndpoint.getAllUsers: Retrieving all users from DynamoDB");
+    return userRepository.getAllUsersById("");
+  }
+  
   //Save Booking
   public void saveBooking(Booking booking) {
 	System.out.println("UserEndpoint.saveBooking: " + booking);

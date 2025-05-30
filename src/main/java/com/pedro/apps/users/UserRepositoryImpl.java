@@ -7,10 +7,17 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.Expression;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
@@ -30,6 +37,52 @@ public class UserRepositoryImpl implements UserRepository {
 			tableName,
 			TableSchema.fromBean((Class<T>) item.getClass()));
 	table.putItem(item);
+  }
+  
+  @Override
+  public List<User> getAllUsersById(String operation) {
+	DynamoDbTable<User> table = enhancedClient.table(tableName, TableSchema.fromBean(User.class));
+	List<User> users = new ArrayList<>();
+	
+	// If operation is empty, get all user records
+	if (operation == null || operation.isEmpty()) {
+	  // Create an expression to filter items where operation is either empty or "user"
+	  // This ensures we only get user profile records and not other entities
+	  Map<String, AttributeValue> expressionValues = new HashMap<>();
+	  expressionValues.put(":userValue", AttributeValue.builder().s("user").build());
+	  expressionValues.put(":emptyValue", AttributeValue.builder().s("").build());
+	  
+	  Expression filterExpression = Expression.builder()
+	      .expression("operation = :userValue OR operation = :emptyValue")
+	      .expressionValues(expressionValues)
+	      .build();
+	  
+	  // Apply the filter to the scan
+	  table.scan(ScanEnhancedRequest.builder()
+	      .filterExpression(filterExpression)
+	      .build())
+	      .items()
+	      .forEach(users::add);
+	      
+	  System.out.println("Found " + users.size() + " users in DynamoDB");
+	} else {
+	  // If operation is specified, use it in the query
+	  Map<String, AttributeValue> expressionValues = new HashMap<>();
+	  expressionValues.put(":operationValue", AttributeValue.builder().s(operation).build());
+	  
+	  Expression filterExpression = Expression.builder()
+	      .expression("operation = :operationValue")
+	      .expressionValues(expressionValues)
+	      .build();
+	  
+	  table.scan(ScanEnhancedRequest.builder()
+	      .filterExpression(filterExpression)
+	      .build())
+	      .items()
+	      .forEach(users::add);
+	}
+	
+	return users;
   }
   
   @Override
@@ -64,4 +117,6 @@ public class UserRepositoryImpl implements UserRepository {
 	results.forEachRemaining(bookings::add);
 	return bookings;
   }
+  
+  
 }
