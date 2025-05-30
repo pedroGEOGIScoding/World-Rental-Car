@@ -63,7 +63,7 @@ export default function HomeView() {
             maxWidth: "300px",
             width: "100%",
           }}
-          onClick={() => navigate("/bookcar/bookcarDates")}
+          onClick={() => navigate("/bookcar/bookingCar/bookcarDates")}
           onMouseOver={e => (e.currentTarget.style.background = '#005fcc')}
           onMouseOut={e => (e.currentTarget.style.background = '#0077ff')}
         >
