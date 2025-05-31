@@ -1,5 +1,5 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { DelegationEndpoint } from 'Frontend/generated/endpoints';
 import { Grid } from '@vaadin/react-components/Grid.js';
 import { GridColumn } from '@vaadin/react-components/GridColumn.js';
@@ -12,6 +12,7 @@ import { NumberField } from '@vaadin/react-components/NumberField.js';
 import { FormLayout } from '@vaadin/react-components/FormLayout.js';
 import type Delegation from 'Frontend/generated/com/pedro/apps/delegations/Delegation';
 import { useNavigate } from 'react-router';
+import 'leaflet/dist/leaflet.css';
 
 export const config: ViewConfig = {
   menu: { order: 8, icon: 'line-awesome/svg/warehouse-solid.svg' },
@@ -39,6 +40,11 @@ export default function DelegationsAdminView() {
   const [availableCarQty, setAvailableCarQty] = useState(0);
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  
+  // Map references
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const [selectedDelegation, setSelectedDelegation] = useState<Delegation | null>(null);
 
   useEffect(() => {
     // Fetch all delegations when the component mounts
@@ -128,6 +134,88 @@ export default function DelegationsAdminView() {
     }
   };
 
+  // Initialize map when delegations are loaded
+  useEffect(() => {
+    if (loading || !mapRef.current) return;
+    
+    // If map is already initialized, clean it up
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove();
+      mapInstanceRef.current = null;
+    }
+
+    // Dynamic import of Leaflet to avoid SSR issues
+    import('leaflet').then((L) => {
+      // Create a map instance
+      const map = L.map(mapRef.current!).setView([40, 0], 2); // Default center and zoom
+      mapInstanceRef.current = map;
+      
+      // Add tile layer (map background)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      
+      // Add markers for delegations with valid coordinates
+      const validDelegations = delegations.filter(
+        del => del && typeof del.latDelegation === 'number' && typeof del.lonDelegation === 'number'
+      );
+      
+      if (validDelegations.length > 0) {
+        // Create bounds to fit all markers
+        const bounds = L.latLngBounds([]);
+        
+        validDelegations.forEach(delegation => {
+          // Create marker for each delegation
+          const marker = L.marker([delegation.latDelegation, delegation.lonDelegation])
+            .addTo(map)
+            .bindPopup(`
+              <b>ID:</b> ${delegation.delegationId}<br>
+              <b>Name:</b> ${delegation.name || 'N/A'}<br>
+              <b>Address:</b> ${delegation.address || 'N/A'}<br>
+              <b>City:</b> ${delegation.city || 'N/A'}<br>
+              <b>Phone:</b> ${delegation.phone || 'N/A'}<br>
+              <b>Available Cars:</b> ${delegation.availableCarQty || 0}
+            `);
+          
+          // Extend bounds to include this marker
+          bounds.extend([delegation.latDelegation, delegation.lonDelegation]);
+
+          // Add click event to highlight the selected delegation
+          marker.on('click', () => {
+            setSelectedDelegation(delegation);
+          });
+        });
+        
+        // Fit the map to show all markers with some padding
+        if (bounds.isValid()) {
+          map.fitBounds(bounds, {
+            padding: [50, 50]
+          });
+        }
+      }
+    });
+    
+    // Cleanup function
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [delegations, loading]);
+
+  // Handle window resize for map
+  useEffect(() => {
+    const handleResize = () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <div className="flex flex-col h-full box-border">
       <div className="flex justify-between items-center">
@@ -141,39 +229,54 @@ export default function DelegationsAdminView() {
         </Button>
       </div>
       
-      {loading ? (
-        <div className="flex items-center justify-center p-m flex-grow">
-          <span>Loading delegations...</span>
-        </div>
-      ) : (
-        <div className="flex-grow overflow-auto px-m pb-m">
-          <Grid items={delegations} className="h-full w-full" theme="no-border">
-            <GridColumn path="delegationId" header="Delegation ID" />
-            <GridColumn path="name" header="Name" />
-            <GridColumn path="address" header="Address" />
-            <GridColumn path="city" header="City" />
-            <GridColumn path="phone" header="Phone" />
-            <GridColumn path="email" header="Email" />
-            <GridColumn path="availableCarQty" header="Available Cars" />
-            <GridColumn 
-              header="Actions" 
-              width="150px"
-              frozen
-              textAlign="center"
-              renderer={({ item }) => (
-                <div className="flex gap-s justify-center">
-                  <Button 
-                    theme="tertiary small" 
-                    onClick={() => handleEdit(item as Delegation)}
-                  >
-                    Edit
-                  </Button>
-                </div>
-              )}
-            />
-          </Grid>
-        </div>
-      )}
+      <div className="flex flex-col h-full">
+        {loading ? (
+          <div className="flex items-center justify-center p-m flex-grow">
+            <span>Loading delegations...</span>
+          </div>
+        ) : (
+          <>
+            {/* Upper half with Grid */}
+            <div className="overflow-auto px-m pb-m" style={{ height: '50%' }}>
+              <Grid items={delegations} className="h-full w-full" theme="no-border">
+                <GridColumn path="delegationId" header="Delegation ID" />
+                <GridColumn path="name" header="Name" />
+                <GridColumn path="address" header="Address" />
+                <GridColumn path="city" header="City" />
+                <GridColumn path="phone" header="Phone" />
+                <GridColumn path="email" header="Email" />
+                <GridColumn path="availableCarQty" header="Available Cars" />
+                <GridColumn 
+                  header="Actions" 
+                  width="150px"
+                  frozen
+                  textAlign="center"
+                  renderer={({ item }) => (
+                    <div className="flex gap-s justify-center">
+                      <Button 
+                        theme="tertiary small" 
+                        onClick={() => handleEdit(item as Delegation)}
+                      >
+                        Edit
+                      </Button>
+                    </div>
+                  )}
+                />
+              </Grid>
+            </div>
+            
+            {/* Lower half with Map */}
+            <div className="px-m pb-m" style={{ height: '50%', minHeight: '400px', position: 'relative' }}>
+              <h3 className="mb-s">Delegation Locations</h3>
+              <div 
+                ref={mapRef} 
+                className="w-full h-full" 
+                style={{ position: 'absolute', bottom: '16px', left: '16px', right: '16px', top: '40px' }}
+              ></div>
+            </div>
+          </>
+        )}
+      </div>
       
       {/* Edit Delegation Dialog */}
       <Dialog 
