@@ -73,7 +73,64 @@ public class UserRepositoryImpl implements UserRepository {
       System.err.println("Error querying bookings for user ID " + userId + ": " + e.getMessage());
       e.printStackTrace();
     }
+    return bookings;
+  }
+  
+  @Override
+  public void deleteUser(User user) {
+    try {
+      System.out.println("Attempting to delete user: " + user);
+      System.out.println("User ID: " + user.getUserId());
+      System.out.println("User primary key values: " + user.toString());
+      
+      DynamoDbTable<User> table = enhancedClient.table(tableName, TableSchema.fromBean(User.class));
+      
+      // Try to get the user first to verify it exists
+      User existingUser = table.getItem(Key.builder()
+          .partitionValue(user.getUserId())
+          .build());
+      
+      if (existingUser == null) {
+        System.out.println("User not found in DynamoDB. Cannot delete.");
+        return;
+      }
+      
+      System.out.println("Found user in DynamoDB. Deleting...");
+      
+      // Now delete the item with explicit key
+      table.deleteItem(Key.builder()
+          .partitionValue(user.getUserId())
+          .sortValue(user.getOperation())
+          .build());
+      
+      System.out.println("User deleted successfully.");
+    } catch (Exception e) {
+      System.err.println("Error deleting user: " + e.getMessage());
+      e.printStackTrace();
+    }
+  }
+  
+  @Override
+  public List<Booking> getAllBookings() {
+    DynamoDbTable<Booking> table = enhancedClient.table(tableName, TableSchema.fromBean(Booking.class));
+    List<Booking> bookings = new ArrayList<>();
+    
+    try {
+      // Scan the table for all booking items
+      // Filter for items where operation starts with "booking"
+      table.scan().items().forEach(booking -> {
+        if (booking.getOperation() != null && booking.getOperation().startsWith("booking")) {
+          bookings.add(booking);
+        }
+      });
+      
+      System.out.println("Found " + bookings.size() + " booking items in total");
+    } catch (Exception e) {
+      System.err.println("Error scanning for bookings: " + e.getMessage());
+      e.printStackTrace();
+    }
     
     return bookings;
   }
+  
 }
