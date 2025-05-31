@@ -8,5 +8,4 @@ public interface UserRepository {
   List<Booking> findBookingsByUserId(String userId);
   
   List<User> getAllUsersById(String operation);
-  
 }

@@ -190,13 +190,10 @@ export default function BookcarSelectionView() {
 										alt={`${car.make || 'Unknown'} ${car.model || 'Model'}`}
 										style={{
 											width: '100%',
-											height: 'auto',
-											maxHeight: '160px',
-											objectFit: 'contain',
-											objectPosition: 'center',
+											height: '120px',
+											objectFit: 'cover',
 											borderRadius: '8px',
-											marginBottom: '1rem',
-											backgroundColor: '#f5f5f5'
+											marginBottom: '1rem'
 										}}
 										onError={(e) => {
 											(e.target as HTMLImageElement).src = 'https://placehold.co/300x180?text=Car+Not+Found';

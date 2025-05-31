@@ -29,15 +29,8 @@ public class UserEndpoint {
   }
   
   //Get all users
-  public List<User> getAllUsersById(String userId) {
-    System.out.println("UserEndpoint.getAllUsersById: Retrieving all users with operation/userId: " + userId);
-	return userRepository.getAllUsersById(userId);
-  }
-  
-  //Get all users without operation parameter
-  public List<User> getAllUsers() {
-    System.out.println("UserEndpoint.getAllUsers: Retrieving all users from DynamoDB");
-    return userRepository.getAllUsersById("");
+  public List<User> getAllUsersById(String operation) {
+	return userRepository.getAllUsersById(operation);
   }
   
   //Save Booking
