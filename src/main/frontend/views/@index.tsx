@@ -50,7 +50,7 @@ export default function HomeView() {
         </p>
         <button
           style={{
-            padding: "14px 8vw",
+            padding: "14px 20px",
             fontSize: "clamp(1rem, 2vw, 1.2rem)",
             fontWeight: 600,
             color: "#fff",
@@ -60,14 +60,20 @@ export default function HomeView() {
             cursor: "pointer",
             boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
             transition: "background 0.2s",
-            maxWidth: "300px",
+            maxWidth: "400px",
             width: "100%",
+            textAlign: "center",
+            whiteSpace: "nowrap",
+            letterSpacing: "0.5px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
           }}
           onClick={() => navigate("/bookcar/bookingCar/bookcarDates")}
           onMouseOver={e => (e.currentTarget.style.background = '#005fcc')}
           onMouseOut={e => (e.currentTarget.style.background = '#0077ff')}
         >
-          Book Now
+          Book one of our cars Now
         </button>
       </div>
     </div>
