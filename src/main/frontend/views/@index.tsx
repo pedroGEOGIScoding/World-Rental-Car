@@ -8,6 +8,9 @@ export const config: ViewConfig = {
 
 export default function HomeView() {
   const navigate = useNavigate();
+
+
+
   return (
     <div
       style={{

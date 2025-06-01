@@ -27,10 +27,12 @@
     "date-fns": "2.29.3",
     "leaflet": "^1.9.4",
     "lit": "3.3.0",
+    "oidc-client-ts": "^3.2.1",
     "proj4": "2.15.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-leaflet": "^5.0.0",
+    "react-oidc-context": "^3.3.0",
     "react-router": "7.5.2"
   },
   "devDependencies": {
@@ -128,7 +130,7 @@
       "workbox-core": "7.3.0",
       "workbox-precaching": "7.3.0"
     },
-    "hash": "10b40f2ee70019de58a63dfe98d1c543490a2aabd430b4cc3f8a4964319fa932"
+    "hash": "1c5b464c5d91e2af0b84826e7667bc21427e0ce131b40c8db7aaa624a4fd64a8"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -170,6 +172,8 @@
     "react-router": "$react-router",
     "@fontsource/varela-round": "$@fontsource/varela-round",
     "leaflet": "$leaflet",
-    "react-leaflet": "$react-leaflet"
+    "react-leaflet": "$react-leaflet",
+    "oidc-client-ts": "$oidc-client-ts",
+    "react-oidc-context": "$react-oidc-context"
   }
 }
