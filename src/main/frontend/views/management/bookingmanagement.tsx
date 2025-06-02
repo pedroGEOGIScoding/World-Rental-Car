@@ -79,11 +79,23 @@ export default function BookingManagementView() {
       const bookingsArrays = await Promise.all(bookingPromises);
       
       // Flatten the array of arrays and filter out undefined values
-      const allBookings = bookingsArrays
+      const allBookingsWithDuplicates = bookingsArrays
         .flat()
         .filter((booking): booking is Booking => booking !== undefined && 
           booking.operation !== undefined && 
           booking.operation.startsWith('booking'));
+      
+      // Deduplicate bookings using a Map with userId+operation as the key
+      const uniqueBookingsMap = new Map<string, Booking>();
+      allBookingsWithDuplicates.forEach(booking => {
+        const key = `${booking.userId}-${booking.operation}`;
+        if (!uniqueBookingsMap.has(key)) {
+          uniqueBookingsMap.set(key, booking);
+        }
+      });
+      
+      // Convert Map values back to array
+      const allBookings = Array.from(uniqueBookingsMap.values());
       
       setBookings(allBookings);
     } catch (error) {

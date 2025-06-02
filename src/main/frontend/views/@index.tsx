@@ -9,6 +9,13 @@ export const config: ViewConfig = {
 export default function HomeView() {
   const navigate = useNavigate();
 
+  const cognitoAuthConfig = {
+    authority: "https://cognito-idp.eu-central-1.amazonaws.com/eu-central-1_F4uixLSzk",
+    client_id: "6fum8esptig7hittsrs4mcaaao",
+    redirect_uri: "https://localhost:8080",
+    response_type: "code",
+    scope: "email openid phone",
+  };
 
 
   return (
