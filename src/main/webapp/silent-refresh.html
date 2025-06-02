@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Silent Refresh</title>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/oidc-client-ts/2.2.1/oidc-client-ts.min.js"></script>
+    <script>
+        new oidc.UserManager().signinSilentCallback().catch(function (error) {
+            console.error('Silent refresh error:', error);
+        });
+    </script>
+</body>
+</html>
