@@ -102,10 +102,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Logout function
   const logout = async () => {
     try {
-      await userManager.signoutRedirect();
+      // Simply clear the user data locally
+      setUser(null);
+      
+      // Force redirect to homepage
+      window.location.href = "http://localhost:8080";
     } catch (err) {
       console.error('Logout failed', err);
       setError('Logout failed');
+      
+      // Even if there's an error, try to redirect
+      window.location.href = "http://localhost:8080";
     }
   };
 
