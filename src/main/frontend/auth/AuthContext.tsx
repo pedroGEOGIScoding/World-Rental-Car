@@ -102,17 +102,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Logout function
   const logout = async () => {
     try {
-      // Simply clear the user data locally
+      // Clear user from state first
       setUser(null);
       
-      // Force redirect to homepage
-      window.location.href = "http://localhost:8080";
+      // Remove tokens and user data from storage
+      await userManager.removeUser();
+      
+      // If available, try to revoke tokens (may not be supported by all providers)
+      try {
+        await userManager.revokeTokens();
+      } catch (revokeError) {
+        console.log('Token revocation not supported or failed, continuing logout');
+      }
+      
+      // Force navigation to home page
+      window.location.href = "/";
     } catch (err) {
       console.error('Logout failed', err);
       setError('Logout failed');
       
-      // Even if there's an error, try to redirect
-      window.location.href = "http://localhost:8080";
+      // If logout fails, still try to redirect to home
+      window.location.href = "/";
     }
   };
 
