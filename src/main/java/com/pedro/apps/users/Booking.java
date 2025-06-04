@@ -21,19 +21,6 @@ public class Booking {
   private Delegation pickUpDelegation;
   private Delegation deliverDelegation;
   
-  public Booking(String userId, String operation, Car car, String status, String startDate, String endDate, double totalToPayment, String statusPayment, String statusBooking, Delegation pickUpDelegation, Delegation deliverDelegation) {
-	this.userId = userId;
-	this.operation = operation;
-	this.car = car;
-	this.status = status;
-	this.startDate = startDate;
-	this.endDate = endDate;
-	this.totalToPayment = totalToPayment;
-	this.statusPayment = statusPayment;
-	this.statusBooking = statusBooking;
-	this.pickUpDelegation = pickUpDelegation;
-	this.deliverDelegation = deliverDelegation;
-  }
   
   @DynamoDbPartitionKey
   @DynamoDbAttribute("userId")

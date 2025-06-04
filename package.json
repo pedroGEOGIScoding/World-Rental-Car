@@ -16,7 +16,7 @@
     "@vaadin/hilla-react-i18n": "24.7.5",
     "@vaadin/hilla-react-signals": "24.7.5",
     "@vaadin/polymer-legacy-adapter": "24.7.6",
-    "@vaadin/react-components": "24.7.6",
+    "@vaadin/react-components": "^24.7.6",
     "@vaadin/react-components-pro": "24.7.6",
     "@vaadin/vaadin-development-mode-detector": "2.0.7",
     "@vaadin/vaadin-lumo-styles": "24.7.6",
@@ -25,10 +25,14 @@
     "@vaadin/vaadin-usage-statistics": "2.1.3",
     "construct-style-sheets-polyfill": "3.1.0",
     "date-fns": "2.29.3",
+    "leaflet": "^1.9.4",
     "lit": "3.3.0",
+    "oidc-client-ts": "^3.2.1",
     "proj4": "2.15.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "react-leaflet": "^5.0.0",
+    "react-oidc-context": "^3.3.0",
     "react-router": "7.5.2"
   },
   "devDependencies": {
@@ -36,6 +40,7 @@
     "@preact/signals-react-transform": "0.5.1",
     "@rollup/plugin-replace": "6.0.2",
     "@rollup/pluginutils": "5.1.4",
+    "@types/leaflet": "^1.9.18",
     "@types/react": "18.3.20",
     "@types/react-dom": "18.3.6",
     "@vaadin/hilla-generator-cli": "24.7.5",
@@ -125,7 +130,7 @@
       "workbox-core": "7.3.0",
       "workbox-precaching": "7.3.0"
     },
-    "hash": "d7a3fb18a4fe1cf4a73d1d2b5684d61e52ce565e464a522c0e808903bcc015db"
+    "hash": "1c5b464c5d91e2af0b84826e7667bc21427e0ce131b40c8db7aaa624a4fd64a8"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -165,6 +170,10 @@
     "@vaadin/vaadin-lumo-styles": "$@vaadin/vaadin-lumo-styles",
     "@vaadin/vaadin-material-styles": "$@vaadin/vaadin-material-styles",
     "react-router": "$react-router",
-    "@fontsource/varela-round": "$@fontsource/varela-round"
+    "@fontsource/varela-round": "$@fontsource/varela-round",
+    "leaflet": "$leaflet",
+    "react-leaflet": "$react-leaflet",
+    "oidc-client-ts": "$oidc-client-ts",
+    "react-oidc-context": "$react-oidc-context"
   }
 }

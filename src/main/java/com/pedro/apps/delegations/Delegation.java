@@ -18,6 +18,10 @@ public class Delegation {
   private String phone;
   private String email;
   
+  // Default constructor needed for DynamoDB Enhanced Client deserialization
+  public Delegation() {
+  }
+  
   public Delegation(String delegationId, String operation, String name, String address, String city, float latDelegation, float lonDelegation, int availableCarQty, String phone, String email) {
 	this.delegationId = delegationId;
 	this.operation = operation;

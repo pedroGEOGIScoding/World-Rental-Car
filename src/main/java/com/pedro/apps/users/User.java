@@ -1,5 +1,6 @@
 package com.pedro.apps.users;
 
+
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
@@ -13,15 +14,24 @@ public class User {
   private String email;
   private String fullName;
   private String phone;
+  private UserRole userRole;
   
-  public User(String userId, String operation, String username, String email, String fullName, String phone) {
+  // Default constructor required for DynamoDB's enhanced client
+  public User() {
+	this.userId = "";
+	this.userRole = UserRole.CUSTOMER; // Default status
+  }
+  
+  public User(String userId, String operation, String username, String email, String fullName, String phone, UserRole userRole) {
 	this.userId = userId;
 	this.operation = operation;
 	this.username = username;
 	this.email = email;
 	this.fullName = fullName;
 	this.phone = phone;
+	this.userRole = UserRole.CUSTOMER;
   }
+  
   @DynamoDbPartitionKey
   public String getUserId() {
 	return userId;
@@ -74,5 +84,14 @@ public class User {
   
   public void setPhone(String phone) {
 	this.phone = phone;
+  }
+  
+  @DynamoDbAttribute("userRole")
+  public UserRole getUserRole() {
+	return userRole;
+  }
+  
+  public void setUserRole(UserRole userRole) {
+	this.userRole = userRole;
   }
 }
