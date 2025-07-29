@@ -3,7 +3,6 @@ import { effect, signal } from '@vaadin/hilla-react-signals';
 import { AppLayout, DrawerToggle, Icon, SideNav, SideNavItem } from '@vaadin/react-components';
 import { Suspense, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
-import { useAuth, AuthProvider } from '../auth/AuthContext';
 
 const documentTitleSignal = signal('');
 effect(() => {
@@ -13,12 +12,10 @@ effect(() => {
 // Publish for Vaadin to use
 (window as any).Vaadin.documentTitleSignal = documentTitleSignal;
 
-// Layout content component that uses auth context
-function LayoutContent() {
+export default function MainLayout() {
   const currentTitle = useViewConfig()?.title;
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {
     if (currentTitle) {
@@ -27,13 +24,6 @@ function LayoutContent() {
   }, [currentTitle]);
 
   const menuItems = createMenuItems();
-  
-  // Style for disabled menu items
-  const disabledStyle = {
-    opacity: 0.5,
-    pointerEvents: 'none' as const,
-    cursor: 'not-allowed' as const
-  };
 
   return (
     <AppLayout primarySection="drawer">
@@ -45,33 +35,12 @@ function LayoutContent() {
               <SideNavItem 
                 path={to} 
                 key={to}
-                style={!isAuthenticated && to !== '/' ? disabledStyle : {}}
-                disabled={!isAuthenticated && to !== '/'}
-                onClick={(e) => {
-                  if (!isAuthenticated && to !== '/') {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }
-                }}
               >
                 {icon ? <Icon src={icon} slot="prefix"></Icon> : <></>}
                 {title}
-                {!isAuthenticated && to !== '/' && (
-                  <span style={{ marginLeft: '8px', fontSize: '0.8em', color: '#888' }}>
-                    (Login required)
-                  </span>
-                )}
               </SideNavItem>
             ))}
           </SideNav>
-          {loading && (
-            <div className="text-center text-sm text-secondary">Loading authentication...</div>
-          )}
-          {!loading && !isAuthenticated && (
-            <div className="text-center text-sm text-secondary mt-m">
-              Please login to access all features
-            </div>
-          )}
         </header>
       </div>
 
@@ -84,14 +53,5 @@ function LayoutContent() {
         <Outlet />
       </Suspense>
     </AppLayout>
-  );
-}
-
-// Main Layout component with AuthProvider
-export default function MainLayout() {
-  return (
-    <AuthProvider>
-      <LayoutContent />
-    </AuthProvider>
   );
 }

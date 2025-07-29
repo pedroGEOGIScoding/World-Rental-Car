@@ -1,0 +1,419 @@
+---
+title: "Creating a Runnable JAR for World Rental Car Application"
+subtitle: "A Complete Educational Guide to Spring Boot Application Deployment"
+author: "Development Guide"
+date: "2025-07-29"
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    theme: cosmo
+    highlight-style: github
+  pdf:
+    toc: true
+    number-sections: true
+---
+
+# Introduction and Learning Objectives
+
+## What You'll Learn
+
+By the end of this guide, you will understand:
+
+- **What is a JAR file** and why it's important for Java applications
+- **How Spring Boot applications are packaged** for deployment
+- **The role of Maven** in building Java projects
+- **Java environment configuration** and troubleshooting
+- **Production deployment strategies** for web applications
+- **How to resolve common build issues** systematically
+
+## What is a JAR File?
+
+A **JAR (Java ARchive)** file is like a zip file that contains:
+- Compiled Java classes (`.class` files)
+- Resources (images, configuration files, etc.)
+- Metadata about the application
+
+Think of it as a **shipping container** for your Java application - everything needed to run your program is packaged together in one convenient file.
+
+### Types of JAR Files
+
+1. **Regular JAR**: Contains only your application code
+2. **Fat JAR (Executable JAR)**: Contains your code + all dependencies + embedded server
+   - This is what we're creating today!
+   - Also called "uber JAR" or "shaded JAR"
+
+## Why Create a Runnable JAR?
+
+**Problem**: During development, we run applications from our IDE (like IntelliJ or Eclipse). But what happens when we want to:
+- Deploy to a production server?
+- Share the application with someone who doesn't have the IDE?
+- Run the application on a different computer?
+
+**Solution**: Create a self-contained JAR file that can run anywhere Java is installed!
+
+# Overview
+
+This document provides a comprehensive guide for creating a runnable JAR file for the World Rental Car application, a Spring Boot Vaadin web application. The guide covers the entire process from project analysis to successful deployment, including troubleshooting Java environment issues.
+
+## Project Information
+
+- **Application Name**: World Rental Car
+- **Technology Stack**: Spring Boot + Vaadin + Maven
+- **Java Version**: 21
+- **Main Class**: `com.pedro.apps.Application`
+- **Build Tool**: Maven with Maven Wrapper
+
+# Step-by-Step Process
+
+## 1. Understanding Our Project Structure
+
+### Spring Boot + Vaadin Architecture
+
+Let me explain what we're working with:
+
+#### Spring Boot
+**Spring Boot** is a framework that makes it easy to create Java applications. Think of it as a "starter kit" that:
+- Provides pre-configured settings
+- Includes an embedded web server (Tomcat)
+- Handles dependency management
+- Makes deployment simple
+
+#### Vaadin
+**Vaadin** is a framework for building web user interfaces in Java. Instead of writing HTML/CSS/JavaScript, you write Java code that generates the web interface.
+
+#### Maven
+**Maven** is a build tool that:
+- Manages dependencies (external libraries)
+- Compiles your code
+- Runs tests
+- Packages your application
+
+Think of Maven as your **personal assistant** that handles all the tedious build tasks!
+
+## 2. Project Structure Analysis
+
+Let's examine our project like a detective :
+
+```bash
+# Explore the project root directory
+ls -la /home/pedro/Documents/Arena/World-Rental-Car/
+```
+
+**What we're looking for:**
+- `pom.xml` - Maven's "recipe book" for building the project
+- `src/` - Where our source code lives
+- `mvnw` - Maven wrapper (portable Maven that doesn't require system installation)
+- `target/` - Where build outputs go (created after building)
+
+**Key findings and their significance:**
+- **Maven-based project**: We can use Maven commands to build
+- **Spring Boot application**: Will create an executable JAR automatically
+- **Maven wrapper available**: We don't need Maven installed globally
+- **Production profile configured**: Optimized builds for deployment
+
+## 3. Understanding Maven Configuration
+
+Let's decode the `pom.xml` file like reading a recipe:
+
+```xml
+<groupId>com.pedro.apps</groupId>
+<artifactId>world-renting-car</artifactId>
+<version>1.0-SNAPSHOT</version>
+<packaging>jar</packaging>
+```
+
+**Translation:**
+- `groupId`: Like a company name - identifies who made this
+- `artifactId`: The product name - what this application is called
+- `version`: Current version (SNAPSHOT = still in development)
+- `packaging`: What type of file to create (JAR in our case)
+
+```xml
+<properties>
+    <java.version>21</java.version>
+    <vaadin.version>24.7.5</vaadin.version>
+</properties>
+```
+
+**Why this matters:**
+- Tells Maven we need Java 21 (this will be important later!)
+- Specifies which version of Vaadin to use
+- Ensures consistent versions across the entire project
+
+**The Spring Boot Parent:**
+```xml
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.4.5</version>
+</parent>
+```
+
+This is like **inheriting** from a parent class in programming - we get all the Spring Boot configurations and best practices automatically!
+
+## 4. Initial Build Attempt and Java Version Issue
+
+In software development, **failure is a learning opportunity**! Let's see what happened:
+
+```bash
+./mvnw clean package -Pproduction
+```
+
+**Breaking down this command:**
+- `./mvnw` - Use the Maven wrapper (portable Maven)
+- `clean` - Delete old build files (start fresh)
+- `package` - Compile code and create JAR file
+- `-Pproduction` - Use the "production" profile (optimized settings)
+
+### Understanding the Error
+
+**Error encountered:**
+```
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.13.0:compile 
+(default-compile) on project world-renting-car: Fatal error compiling: 
+error: release version 21 not supported
+```
+
+**What this means in plain English:**
+- Maven is trying to compile our Java code
+- Our project requires Java 21 (as specified in pom.xml)
+- But Maven can't find or use Java 21
+- The build stops because it can't proceed
+
+**Why this happens:**
+Java applications need to know WHERE Java is installed. This is like giving someone directions to your house - without the address, they can't find it!
+
+## 5. Java Environment Deep Dive
+
+### Understanding Java Installation vs. Java Configuration
+
+This is a common source of confusion for developers! Let me explain:
+
+**Installation**: Java software is on your computer
+**Configuration**: Your system knows where to find Java
+
+Think of it like having a car (installation) vs. having the keys and knowing where you parked it (configuration)!
+
+### 5.1 Verify Java Installation
+
+```bash
+java -version
+```
+
+**What this command does:**
+- Asks the system: "What version of Java can you run?"
+- If Java is properly installed and in PATH, you'll see version info
+
+**Our output:**
+```
+openjdk version "21.0.8" 2025-07-15
+OpenJDK Runtime Environment (build 21.0.8+9-Ubuntu-0ubuntu124.04.1)
+OpenJDK 64-Bit Server VM (build 21.0.8+9-Ubuntu-0ubuntu124.04.1, mixed mode, sharing)
+```
+
+**Analysis:**
+- Java 21 is installed 
+- It's OpenJDK (open-source version of Java)
+- It's the 64-bit version (good for performance)
+
+### 5.2 Check JAVA_HOME Environment Variable
+
+```bash
+echo $JAVA_HOME
+```
+
+**What is JAVA_HOME?**
+JAVA_HOME is an **environment variable** that tells programs (like Maven) exactly where Java is installed. It's like a GPS coordinate for Java!
+
+**Our output:** *(empty)*
+
+**Problem identified!** 
+- Java is installed 
+- But JAVA_HOME is not set 
+- Maven doesn't know where to find Java
+
+### 5.3 Detective Work - Find Java's Location
+
+```bash
+which java
+```
+**Output:** `/usr/bin/java`
+
+This tells us where the `java` command is, but it's usually a symbolic link (shortcut). We need the real location:
+
+```bash
+readlink -f /usr/bin/java
+```
+**Output:** `/usr/lib/jvm/java-21-openjdk-amd64/bin/java`
+
+**Eureka!** 
+- Java 21 is installed at: `/usr/lib/jvm/java-21-openjdk-amd64`
+- This is what we need to set as JAVA_HOME
+
+### Understanding Environment Variables
+
+**Environment variables** are like global settings for your computer. They're key-value pairs that programs can read to understand their environment.
+
+**Examples:**
+- `HOME` - Your user's home directory
+- `PATH` - Where to look for executable programs
+- `JAVA_HOME` - Where Java is installed
+
+**Why Maven needs JAVA_HOME:**
+- Maven is a Java program itself
+- It needs to compile Java code
+- It must know which Java version to use
+- JAVA_HOME provides this information
+
+## 6. Successful Build with Proper Java Configuration
+
+We resolved the issue by setting the `JAVA_HOME` environment variable during the build process:
+
+```bash
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 ./mvnw clean package -Pproduction
+```
+
+### Build Process Details
+
+The successful build process included:
+
+1. **Clean phase**: Removed previous build artifacts
+2. **Resource processing**: Copied application resources
+3. **Frontend preparation**: Vaadin frontend optimization for production
+4. **Compilation**: Java source code compilation with Java 21
+5. **Testing**: Executed unit tests (6 tests, all passed)
+6. **JAR creation**: Created the executable JAR file
+7. **Repackaging**: Spring Boot plugin created the fat JAR with all dependencies
+
+**Build output highlights:**
+```
+[INFO] BUILD SUCCESS
+[INFO] Total time: 25.801 s
+[INFO] Finished at: 2025-07-29T08:49:59+02:00
+```
+
+## 7. JAR File Verification
+
+### 7.1 Check Generated Files
+
+```bash
+ls -la target/
+```
+
+**Generated files:**
+- `world-renting-car-1.0-SNAPSHOT.jar` (68,206,818 bytes) - **Executable JAR**
+- `world-renting-car-1.0-SNAPSHOT.jar.original` (1,718,610 bytes) - Original JAR
+
+### 7.2 Test JAR Execution
+
+```bash
+java -jar target/world-renting-car-1.0-SNAPSHOT.jar --server.port=8080
+```
+
+**Successful startup output:**
+```
+2025-07-29T08:50:40.045+02:00  INFO 12857 --- [main] com.pedro.apps.Application : 
+Started Application in 4.062 seconds (process running for 4.732)
+2025-07-29T08:50:39.828+02:00  INFO 12857 --- [main] c.v.f.s.DefaultDeploymentConfiguration : 
+Vaadin is running in production mode.
+2025-07-29T08:50:40.030+02:00  INFO 12857 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer : 
+Tomcat started on port 8080 (http) with context path '/'
+```
+
+**Verification successful**: Application starts correctly with embedded Tomcat server.
+
+# Technical Details
+
+## JAR File Characteristics
+
+| Property | Value |
+|----------|-------|
+| **File Size** | 68.2 MB |
+| **Type** | Executable JAR (Fat JAR) |
+| **Dependencies** | All included |
+| **Server** | Embedded Tomcat |
+| **Frontend** | Production-optimized Vaadin |
+
+## Build Configuration Features
+
+- **Production Profile**: Optimized frontend build with minification
+- **Spring Boot Plugin**: Creates executable JAR with embedded server
+- **Vaadin Plugin**: Handles frontend resource preparation and optimization
+- **Dependency Management**: All required libraries bundled in the JAR
+
+# Deployment Summary
+
+## Prerequisites
+
+- **Java Runtime**: OpenJDK 21 or higher
+- **Memory**: Minimum 512MB RAM recommended
+- **Network**: Port 8080 available (or specify alternative)
+
+## Quick Start Commands
+
+### 1. Build the Application
+
+```bash
+# Navigate to project directory
+cd /home/pedro/Documents/Arena/World-Rental-Car
+
+# Build with production profile
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 ./mvnw clean package -Pproduction
+```
+
+### 2. Run the Application
+
+```bash
+# Default port (8080)
+java -jar target/world-renting-car-1.0-SNAPSHOT.jar
+
+# Custom port
+java -jar target/world-renting-car-1.0-SNAPSHOT.jar --server.port=9090
+
+# With additional JVM options
+java -Xmx1g -jar target/world-renting-car-1.0-SNAPSHOT.jar
+```
+
+### 3. Access the Application
+
+- **URL**: `http://localhost:8080` (or your specified port)
+- **Features**: Full car rental booking system with authentication
+- **UI**: Modern Vaadin-based web interface
+
+## Troubleshooting Tips
+
+### Java Version Issues
+
+If you encounter Java version errors:
+
+1. **Check Java version**: `java -version`
+2. **Set JAVA_HOME**: `export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64`
+3. **Verify Maven uses correct Java**: `./mvnw -version`
+
+### Build Failures
+
+Common solutions:
+
+- **Clean build**: `./mvnw clean`
+- **Skip tests**: `./mvnw package -DskipTests`
+- **Verbose output**: `./mvnw package -X`
+
+### Runtime Issues
+
+- **Port conflicts**: Use `--server.port=XXXX`
+- **Memory issues**: Add `-Xmx2g` for more heap space
+- **Database connectivity**: Ensure AWS credentials are configured
+
+# Conclusion
+
+The World Rental Car application has been successfully packaged into a standalone JAR file that can run independently without an IDE. The key to success was properly configuring the Java environment and using the production build profile for optimal performance.
+
+The resulting JAR file is completely self-contained, including:
+- All application dependencies
+- Embedded Tomcat web server
+- Production-optimized Vaadin frontend
+- Complete Spring Boot configuration
+
+This makes deployment simple and portable across different environments that support Java 21.
